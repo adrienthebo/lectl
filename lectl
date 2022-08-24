@@ -370,6 +370,7 @@ for caid in ${caidsle};do
 # Get issued certificates for domain and subdomains (X1, X2, X3, X4, etc.)
     echo "https://crt.sh/?Identity=${domain}&iCAID=${caid}${expired}${numberofcerts}"
     _cache_curl "${domain}-${caid}-${expired}-${numberofcerts}" -sSk "https://crt.sh/?Identity=${domain}&iCAID=${caid}${expired}${numberofcerts}" >> "${tempfile}"
+
     _checkerror "Failed to retrieve https://crt.sh/?Identity=${domain}&iCAID=${caid}${expired}${numberofcerts}"
 
 # Wildcard % is used by default so no need to perform 2 queries
@@ -400,7 +401,7 @@ numberprecerts=0
 for i in $(echo "${certsfound}");do
     id=$(echo "$i" | $_awk -F'"' '{print $1}')
 
-    _curl_cache "cert-${id}" -sS "${crturldomainid}${id}" > "${tempfile}.${id}" 2>/dev/null
+    _cache_curl "cert-${id}" -sS "${crturldomainid}${id}" > "${tempfile}.${id}"
     _checkerror "Failed to retrieve ${crturldomainid}${id}"
     
     algorithm=$($_sed 's/&nbsp;//g' "${tempfile}.${id}" | $_sed 's/<BR>/\n/g' | $_grep PublicKeyAlgorithm | $_grep rsa &>/dev/null && echo RSA || echo ECC)
