@@ -106,6 +106,8 @@
 # Clean up and comment the code
 # Create auto-update version (comming...some day...or not)
 
+source "$(dirname "${BASH_SOURCE[0]}")/lib/utils.sh"
+
 #Variables for utilities
 _date=date
 _sed=sed
@@ -352,7 +354,9 @@ echo "$($_date +"%Y/%B/%d %H:%M:%S") - Checking ${typeofcerts} certs for ${domai
 echo " "
 
 #Get CA ids assigned to Let's Encrypt by crt.sh
-caidsle=$($_curl -sSk "https://crt.sh/?CAName=%25s+Encrypt%25")
+__lectl_debug "Fetch letsencrypt CA IDs"
+
+caidsle=$(_cache_curl "ca_ids.txt" -sSk "https://crt.sh/?CAName=%25s+Encrypt%25")
 _checkerror "Failed to retrieve Lets Encrypt CA ids"
 
 caidsle=$(echo "$caidsle" | $_awk -F '=|"|<' '/caid/ {print $6}')
@@ -364,7 +368,8 @@ numberofcerts="&p=1&n=${maxnumberofcerts}"
 
 for caid in ${caidsle};do
 # Get issued certificates for domain and subdomains (X1, X2, X3, X4, etc.)
-    $_curl -sSk "https://crt.sh/?Identity=${domain}&iCAID=${caid}${expired}${numberofcerts}" >> "${tempfile}" 2>/dev/null
+    echo "https://crt.sh/?Identity=${domain}&iCAID=${caid}${expired}${numberofcerts}"
+    _cache_curl "${domain}-${caid}-${expired}-${numberofcerts}" -sSk "https://crt.sh/?Identity=${domain}&iCAID=${caid}${expired}${numberofcerts}" >> "${tempfile}"
     _checkerror "Failed to retrieve https://crt.sh/?Identity=${domain}&iCAID=${caid}${expired}${numberofcerts}"
 
 # Wildcard % is used by default so no need to perform 2 queries
