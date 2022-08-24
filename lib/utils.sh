@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-readonly _CACHE_DIR
-_CACHE_DIR="$(realpath "$(dirname "${BASH_SOURCE[0]}")/../cache")"
+readonly _CACHE_DIR="$(realpath "$(dirname "${BASH_SOURCE[0]}")/../cache")"
 
 CACHE_EXPIRATION=$(( 60 * 60 * 24 ))
 
@@ -11,7 +10,7 @@ case "$(uname)" in
         ;;
 
     Linux)
-        readonly _STAT_MODIFIED_FMT="--format %y"
+        readonly _STAT_MODIFIED_FMT="--format %Y"
         ;;
     *)
         echo "Error: unknown platform $(uname), cannot determine file stat format" 1>&2
@@ -21,7 +20,7 @@ esac
 
 
 __lectl_debug() {
-    if [[ -n $LECTL_DEBUG ]]; then
+    if [[ -n $_LECTL_DEBUG ]]; then
         echo "debug: ${@}" 1>&2
     fi
 }
