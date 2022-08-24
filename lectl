@@ -400,7 +400,7 @@ numberprecerts=0
 for i in $(echo "${certsfound}");do
     id=$(echo "$i" | $_awk -F'"' '{print $1}')
 
-    $_curl -sS "${crturldomainid}${id}" > "${tempfile}.${id}" 2>/dev/null
+    _curl_cache "cert-${id}" -sS "${crturldomainid}${id}" > "${tempfile}.${id}" 2>/dev/null
     _checkerror "Failed to retrieve ${crturldomainid}${id}"
     
     algorithm=$($_sed 's/&nbsp;//g' "${tempfile}.${id}" | $_sed 's/<BR>/\n/g' | $_grep PublicKeyAlgorithm | $_grep rsa &>/dev/null && echo RSA || echo ECC)
